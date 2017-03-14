@@ -5,7 +5,7 @@ const int buttonPin = 8;     // the number of the pushbutton pin
 
 Servo myservo;  // create servo object to control a servo
 
-int pos = 0;    // variable to store the servo position. might not need
+
 int outPut = 0;
 int servoPos[] = {11, 44, 72, 120, 162}; //set array
 int posCount = 5;           // the number of pins (i.e. the length of the array)
@@ -26,6 +26,7 @@ void loop() {
   // read the state of the pushbutton value:
   buttonState = digitalRead(buttonPin);
   if (buttonState != lastButtonState) {  // if the state has changed, increment the counter
+    
     if (buttonState == HIGH) {
       buttonCount++;
       Serial.println("on");
@@ -38,4 +39,5 @@ void loop() {
       myservo.write(servoPos[outPut]);             // sets the servo position according to the outPut
       delay(1000);     }                      // waits for the servo to get there\
     }
+    lastButtonState = buttonState;
   }  }
