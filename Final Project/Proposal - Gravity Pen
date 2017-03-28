@@ -16,3 +16,6 @@ and map it into the virtual world, so it can interact in that space.
 Prototype may be made using a printer motor and track to move the weight in and out. The motor will need to be mounted conveniently
 and all parts consolidated to the center of gravity to allow for proper user testing. Other materials may include light sensors, distance sensors, 
 accelerometers, pressure sensors, and buttons.
+
+The weight should be held somewhat parallel to the ground, independent of how the pen is held, in order to maintain a consistent torque felt in the hand.
+This can be achieved by attaching 2 small servo motors to the printer track. Each motor will provide an extra axis of rotation to maintain the positiono of the weight.
