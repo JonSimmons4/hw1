@@ -1,0 +1,18 @@
+Create a device to simulate gravity in Virtual Reality.
+
+A weighted inner rod moves in and out of a hollow tube, to be held in the hand like a pen.
+
+When a virtual object is picked up, the interior rod moves outward to increase the moment of inertia and create the sensation of a weight hanging off the 
+tip of the pen.
+
+When the virtual object is released, the rod retracts into the pen and the weight becomes balanced in the hand, feeling significantly lighter than before.
+
+The weight can potentially be moved and stopped at precise times to jerk the pen, creating a sensation of hitting a virtual “obstruction”. 
+
+A light can be used to simulate a virtual object. When the pen is moved into the field of light, a light sensor will trigger to move the weighted rod outward.
+A more complex version would be to connect the pen to a virtual world. This would require a series of highly accurate sensors to detect location of the pen, 
+and map it into the virtual world, so it can interact in that space.
+
+Prototype may be made using a printer motor and track to move the weight in and out. The motor will need to be mounted conveniently
+and all parts consolidated to the center of gravity to allow for proper user testing. Other materials may include light sensors, distance sensors, 
+accelerometers, pressure sensors, and buttons.
