@@ -1,0 +1,98 @@
+
+#include <Stepper.h>
+#include <Servo.h>    // servo library
+#include <SPI.h>  // serial protocol
+#include <Wire.h>
+#include <SFE_LSM9DS0.h>   // Custom library which works with my sensor device. Breaks down the accel, gyro, and mag data into useful yaw, pitch, and roll using madgwicks and mahony algorithms.
+#include <LSM9DS0_AHRS.h>  // Adafruit library for reading raw data from the accelerometer, gyroscope, magnetometer device
+
+const int buttonPin = A0;     // the number of the pushbutton pin
+int outPut = 0;               // variable for stepper motor output
+int stepperPos[] = { -175, -175, 175, 175}; //set array to move the stepper half the distance of the printer track each time the button is pressed.
+int posCount = 4;           // the number of pins (i.e. the length of the array)
+int buttonState = 0;         // variable for reading the pushbutton status
+int buttonCount = 0;   // number of button presses
+int lastButtonState = 0;  // last state of the button
+
+LSM9DS0_AHRS* ahrs;
+int in1Pin = 8;
+int in2Pin = 9;
+int in3Pin = 10;
+int in4Pin = 11; // stepper output pins (8,9,10,11)
+Stepper motor(512, in1Pin, in2Pin, in3Pin, in4Pin);
+
+int led = 13;  // led pin used to represent serial data acquisition (this comes from the programmer who wrote the SFE_LSM9DS0.h library)
+int count = 0;
+int count_delta = 0;
+
+int Avalx;
+int Avaly;    // variables to read the sensor data to be used for the x and y servos
+Servo myservox;  // create servo object to control servo x
+Servo myservoy;   // create servo object to control servo y
+int pos = 0;    // variable to store the servo position
+
+void setup()
+{
+  Serial.begin(115200); // the sensor and algorithms require this serial speed
+  pinMode(led, OUTPUT);
+
+  ahrs = new LSM9DS0_AHRS(MADGWICK); //references the Madgwick algorithm embedded in the SFE_LSM9DS0.h library
+  myservox.attach(7);  // attaches the servo on pin 7 to the servo object
+  myservoy.attach(12); // attaches the servo on pin 12 to the servo object
+  pinMode(in2Pin, OUTPUT);
+  pinMode(in3Pin, OUTPUT);
+  pinMode(in4Pin, OUTPUT);
+  motor.setSpeed(20);  // speed of the stepper motor
+}
+void loop()
+{
+  ahrs->update();
+
+  count_delta = millis() - count; // Led blinks as the serial monitor takes readings. If this section is removed,
+  // the program does not work. This function is required to continue to reference the library.
+  if (count_delta < 250)
+    digitalWrite(led, HIGH); // LED on
+  else
+    digitalWrite(led, LOW); // LED off
+
+  if (count_delta > 500)
+  {
+    Serial.print("Yaw, Pitch, Roll: ");  // write this
+    Serial.print(ahrs->yaw, 2); // print yaw data
+    Serial.print(", ");
+    Serial.print(ahrs->pitch, 2); // print pitch
+    Serial.print(", ");
+    Serial.print(ahrs->roll, 2); // print roll
+    Serial.print(", dt = "); Serial.println(ahrs->dt, 4);
+    count = millis();
+  }
+  Avalx = analogRead(ahrs->roll);            // reads the calculated roll value from the sensors (approx. value between -80 and 80)
+  Avalx = map(ahrs->roll, -80, 80, 5, 175);     // scale it to use it with the servo (value between 5 and 175)
+  myservox.write(Avalx);                  // sets the servo position according to the scaled value
+  Avaly = analogRead(ahrs->pitch);
+  Avaly = map(ahrs->pitch, 80, -80, 175, 5);
+  myservoy.write(Avaly);
+
+
+
+  buttonState = digitalRead(buttonPin);  // read the state of the pushbutton value:
+  if (buttonState != lastButtonState) {  // if the state has changed, increment the counter
+
+    if (buttonState == HIGH) {
+      buttonCount++;
+      Serial.println("on");
+      Serial.print("buttonCount: ");
+      Serial.println(buttonCount); // displays the current button count
+      int outPut = buttonCount % posCount ; //position in array
+      Serial.print("move to outPut = ");
+      Serial.println(stepperPos[outPut]); //prints the output position of the stepper motor
+      motor.step(stepperPos[outPut]);     // move stepper motor according to position in array
+
+      delay(200);  // waits for the stepper to get there
+    }
+  }
+
+  lastButtonState = buttonState; // edge detection
+}
+}
+
